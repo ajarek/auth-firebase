@@ -1,6 +1,7 @@
 import {signIn} from './auth/signIn';
 import {signUp} from './auth/signUp';
 import {Form} from './components/form';
+
 //sigIn 
 const renderFormSignIn = () => {
 const form = new Form("Sign In","sign-in","resultSignIn");
@@ -19,8 +20,15 @@ const formLogin=(e)=>{
         }
         else {
             console.log(res);
-            document.querySelector('.resultSignIn').innerHTML=`LOGGED IN : ${res.email.split('@')[0].toUpperCase()};`
+            document.querySelector('.resultSignIn').innerHTML=`LOGGED IN : ${res.email.split('@')[0].toUpperCase()}<br>
+            email : ${res.email}<br>
+            expires at : ${res.expiresIn}<br>
+            local id: ${res.localId}`
+            localStorage.setItem('token', res.idToken);
+            localStorage.setItem('refreshToken', res.refreshToken);
+
             clearForm(e.target);
+           
         }
        
     })
@@ -64,3 +72,8 @@ renderFormSignUp();
 const clearForm = (form) => {
     form.reset();
 }
+
+
+    
+    
+    
