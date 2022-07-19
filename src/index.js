@@ -4,6 +4,7 @@ import {Form} from './components/form';
 import {getUserData} from './auth/getUserData';
 import {BoardUser} from './components/boardDownloadData';
 import {updateUser} from './auth/updateUser';
+import {DataForm} from './components/dataUpdateForm';
 //sigIn 
 const renderFormSignIn = () => {
 const form = new Form("Sign In","sign-in","resultSignIn");
@@ -17,7 +18,6 @@ const formLogin=(e)=>{
     const password = e.target[1].value;
     signIn(email, password).then(res => {
         if(res.error) {
-        console.log(res.error.message);
         document.querySelector('.resultSignIn').innerHTML=res.error.message;
         }
         else {
@@ -44,19 +44,17 @@ document.querySelector('#root').appendChild(form.render());
 }
 
 const formSignUp=(e)=>{
-    e.preventDefault();
+    e.preventDefault(); 
     const email = e.target[0].value;
     const password = e.target[1].value;
     signUp(email, password).then(res => {
         if(res.error) {
-        console.log(res.error.message);
-        document.querySelector('.resultSignUp').innerHTML=res.error.message;
-        
+        document.querySelector('.resultSignUp').innerHTML=res.error.message;      
         }
         else {
-            console.log(res);
             document.querySelector('.resultSignUp').innerHTML=`SIGNED UP : ${res.email.split('@')[0].toUpperCase()};`
             clearForm(e.target);
+           
         }
     })
 }
@@ -67,7 +65,7 @@ const eventSave=()=>{
 
 //read User Data
 const renderUserData = () => {
-    const board=new BoardUser("User Data","btnUserData","data");
+    const board=new BoardUser("data");
     document.querySelector('body').appendChild(board.render());
     eventUserData();
 }
@@ -76,11 +74,9 @@ const readUserData = () => {
     const token = localStorage.getItem('token');
     getUserData(token).then(res => {
         if(res.error) {
-        console.log(res.error.message);
         document.querySelector('.data').innerHTML=res.error.message;
         }
         else {
-            console.log(res);
             document.querySelector('.data').innerHTML=`
             display Name:${res.users[0].displayName}<br>
             photo Url:<img src="${res.users[0].photoUrl}"><br>
@@ -96,41 +92,74 @@ const eventUserData=()=>{
     document.querySelector('#btnUserData').addEventListener('click', readUserData);
 }
 //update User
-const renderUpdateUser = () => {
-    const board=new BoardUser("Update User","btnUpdateUser","update");
-    document.querySelector('body').appendChild(board.render());
-    eventUpdateUser();
+const updateUserData = (e) => {
+    const tokenControl = localStorage.getItem('token');
+    if(tokenControl){
+    e.preventDefault();
+    document.querySelector('body').innerHTML='';
+    const form = new DataForm("name","foto");
+    document.querySelector('body').append(form.render());
+    eventSubmitUpdateUserData()
+    }
+    else{
+        alert("You need to sign in first");
+    }
+}
+const eventUpdateUserData=()=>{
+    document.querySelector('#btnUpdateUser').addEventListener('click', updateUserData);
 }
 
-const updateUserData = () => {
-    updateUser('Jennie', 'https://randomuser.me/api/portraits/men/75.jpg').then(res => {
+const renderSubmitUpdateUser = () => {
+    const board=new BoardUser("update");
+    document.querySelector('body').appendChild(board.render());
+    eventUpdateUserData();
+}
+
+const  submitUpdateUserData = (e) => {
+    e.preventDefault();
+    updateUser(`${e.target[0].value}`, `${e.target[1].value}`).then(res => {
         if(res.error) {
-        console.log(res.error.message);
-        document.querySelector('.update').innerHTML=res.error.message;
+        document.querySelector('.updateData').innerHTML=res.error.message;
         }
         else {
-            console.log(res);
-            document.querySelector('.update').innerHTML=`
+            document.querySelector('.updateData').innerHTML=`
+            Updated correctly :<br>
             display name:${res.displayName}<br>
             photo url:${res.photoUrl}<br>
             `
+            clearForm(e.target);
         }
     })
 }
-const eventUpdateUser=()=>{
-    document.querySelector('#btnUpdateUser').addEventListener('click', updateUserData);
+const eventSubmitUpdateUserData=()=>{
+    document.querySelector('#formUpdateUser').addEventListener('submit', submitUpdateUserData);
 }
 
 //clear Form
 const clearForm = (form) => {
     form.reset();
 }
+//logout
+const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    document.querySelector('.resultSignIn').innerHTML=`LOGGED OUT`;
+    document.querySelector('.resultSignUp').innerHTML=`SIGNED UP`;
+    document.querySelector('.data').innerHTML=''
+   
+}
+
+const eventLogout=()=>{
+    document.querySelector('#btnLogout').addEventListener('click', logout);
+}
 
 const initializeApp = () => {
     renderFormSignIn();
     renderFormSignUp();
     renderUserData();
-    renderUpdateUser();
+    renderSubmitUpdateUser();
+    eventUpdateUserData();
+    eventLogout();
 }
 
 initializeApp();    
