@@ -7,6 +7,7 @@ import {updateUser} from './auth/updateUser';
 import {DataForm} from './components/dataUpdateForm';
 import {sendPasswordResetEmail} from './auth/sendPasswordResetEmail';
 import {deleteUser} from './auth/deleteUser';
+import {makeAuthorizedRequest} from './auth/makeAuthorizedRequest';
 //sigIn 
 const renderFormSignIn = () => {
 const form = new Form("Sign In","sign-in","resultSignIn");
@@ -75,6 +76,7 @@ const renderUserData = () => {
 const readUserData = () => {
     const token = localStorage.getItem('token');
     getUserData(token).then(res => {
+        console.log(res);
         if(res.error) {
         document.querySelector('.data').innerHTML=res.error.message;
         }
@@ -193,6 +195,36 @@ const deleteUserAccount = () => {
 const eventDeleteUserAccount=()=>{
     document.querySelector('#btnDeleteUser').addEventListener('click', deleteUserAccount);
 }
+
+//make Authorized Request
+const AuthorizedRequest = () => {  
+    const token = localStorage.getItem('token');
+    if(token){
+        const resourceName=prompt("Enter resource name or empty");
+    const url=`https://ajarek-my-database-default-rtdb.europe-west1.firebasedatabase.app/${resourceName}/.json`
+        makeAuthorizedRequest(token,'GET',url).then(res => {
+        if(res.error) {
+        document.querySelector('.resultSignIn').innerHTML=res.error.message;
+        }
+        else {
+            document.querySelector('.resultSignIn').innerHTML=''
+            for (const [key, value] of Object.entries(res)) {
+                for(const [key2, value2] of Object.entries(value)){
+                 document.querySelector('.resultSignIn').innerHTML+=`${key}: ${key2} ${value2}<br>`
+              }
+            }
+        }
+        
+    })
+    }
+    else{
+        alert("You need to sign in first");
+    }
+}
+const eventAuthorizedRequest=()=>{
+    document.querySelector('#btnAuthorizedRequest').addEventListener('click', AuthorizedRequest);
+}
+//initiation
 const initializeApp = () => {
     renderFormSignIn();
     renderFormSignUp();
@@ -202,6 +234,7 @@ const initializeApp = () => {
     eventLogout();
     eventResetPassword();
     eventDeleteUserAccount();
+    eventAuthorizedRequest();
 }
 
 initializeApp();    
