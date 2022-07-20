@@ -5,6 +5,8 @@ import {getUserData} from './auth/getUserData';
 import {BoardUser} from './components/boardDownloadData';
 import {updateUser} from './auth/updateUser';
 import {DataForm} from './components/dataUpdateForm';
+import {sendPasswordResetEmail} from './auth/sendPasswordResetEmail';
+import {deleteUser} from './auth/deleteUser';
 //sigIn 
 const renderFormSignIn = () => {
 const form = new Form("Sign In","sign-in","resultSignIn");
@@ -153,6 +155,44 @@ const eventLogout=()=>{
     document.querySelector('#btnLogout').addEventListener('click', logout);
 }
 
+//reset password
+const resetPassword = () => {
+    const email = prompt("Enter your email");
+    sendPasswordResetEmail(email).then(res => {
+        if(res.error) {
+        document.querySelector('.resultSignIn').innerHTML=res.error.message;
+        }
+        else {
+            document.querySelector('.resultSignIn').innerHTML=`Email sent`
+        }
+    })
+}
+
+const eventResetPassword=()=>{
+    document.querySelector('#btnResetPassword').addEventListener('click', resetPassword);
+}
+
+//delete User
+const deleteUserAccount = () => {
+    const tokenControl = localStorage.getItem('token');
+    if(tokenControl){
+    deleteUser().then(res => {
+        if(res.error) {
+        document.querySelector('.resultSignIn').innerHTML=res.error.message;
+        }
+        else {
+            document.querySelector('.resultSignIn').innerHTML=`User deleted`
+        }
+    })
+    }
+    else{
+        alert("You need to sign in first");
+    }
+}
+
+const eventDeleteUserAccount=()=>{
+    document.querySelector('#btnDeleteUser').addEventListener('click', deleteUserAccount);
+}
 const initializeApp = () => {
     renderFormSignIn();
     renderFormSignUp();
@@ -160,6 +200,8 @@ const initializeApp = () => {
     renderSubmitUpdateUser();
     eventUpdateUserData();
     eventLogout();
+    eventResetPassword();
+    eventDeleteUserAccount();
 }
 
 initializeApp();    
