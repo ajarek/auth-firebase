@@ -10,6 +10,6 @@ export const refreshTokens = () => {
     })
 }
 else {
-    alert('You need to sign in first')
+    return
 }
 }

@@ -30,6 +30,7 @@ const formLogin = (e) => {
       localStorage.setItem("token", res.idToken);
       localStorage.setItem("refreshToken", res.refreshToken);
       clearForm(e.target);
+      document.querySelector('.info').innerHTML="User is logged in"
     }
   });
 };
@@ -158,6 +159,7 @@ const logout = () => {
   document.querySelector(".resultSignIn").innerHTML = `LOGGED OUT`;
   document.querySelector(".resultSignUp").innerHTML = `SIGNED UP`;
   document.querySelector(".data").innerHTML = "";
+  document.querySelector('.info').innerHTML="User is not logged in"
 };
 
 const eventLogout = () => {
@@ -206,8 +208,8 @@ const eventDeleteUserAccount = () => {
 
 //make Authorized Request
 const AuthorizedRequest = () => {
-  if (checkIfUserIsLoggedIn()) {
-    document.querySelector('.info').innerHTML="User is logged in"
+  const token = localStorage.getItem('token');
+  if(token){
     const resourceName = prompt("Enter resource name or empty");
     const url = `https://ajarek-my-database-default-rtdb.europe-west1.firebasedatabase.app/${resourceName}/.json`;
     makeAuthorizedRequest("GET", url).then((res) => {
@@ -225,7 +227,7 @@ const AuthorizedRequest = () => {
       }
     });
   } else {
-    document.querySelector('.info').innerHTML="User is not logged in"
+    alert("You need to sign in first");
   }
 };
 
@@ -245,6 +247,11 @@ const initializeApp = () => {
   eventResetPassword();
   eventDeleteUserAccount();
   eventAuthorizedRequest();
+  if (checkIfUserIsLoggedIn()) {
+    document.querySelector('.info').innerHTML="User is logged in"}
+    else {
+      document.querySelector('.info').innerHTML="User is not logged in"
+    }
 };
 
 initializeApp();
